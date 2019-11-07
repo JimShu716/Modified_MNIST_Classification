@@ -8,8 +8,8 @@ import torchvision
 import matplotlib.pyplot as plt
 
 # Hyperparameters
-EPOCH = 1
-BATCH_SIZE = 50
+EPOCH = 3
+BATCH_SIZE = 100
 LR = 0.01
 DOWNLAD_MINST = False
 # 文件路径自己去改~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ：） ：） ：） :< :< :<
@@ -21,13 +21,13 @@ train_img = torch.Tensor(train_img)
 train_out = torch.tensor(train_out, dtype=torch.int64)
 test_img = torch.Tensor(test_img)
 
-# 自己改测试用的大小
-x = torch.unsqueeze(train_img, dim=1)[:26000] / 255.
-y = train_out[:26000]
+# 自己改测试用的大小 50000改成别的->?
+x = torch.unsqueeze(train_img, dim=1)[:50000] / 255.
+y = train_out[:50000]
 
 # mini-sample for testing
-x_t = torch.unsqueeze(train_img, dim=1)[:20] / 255.
-y_t = train_out[:20]
+x_t = torch.unsqueeze(train_img, dim=1)[:30] / 255.
+y_t = train_out[:30]
 
 my_dataset = Data.TensorDataset(x, y)
 train_loader = Data.DataLoader(dataset=my_dataset, batch_size=BATCH_SIZE, shuffle=True)
