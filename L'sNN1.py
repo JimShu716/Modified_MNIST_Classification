@@ -9,8 +9,8 @@ import matplotlib.pyplot as plt
 
 # Hyperparameters
 EPOCH = 1
-BATCH_SIZE = 2
-LR = 0.001
+BATCH_SIZE = 50
+LR = 0.01
 DOWNLAD_MINST = False
 # 文件路径自己去改~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ：） ：） ：） :< :< :<
 train_img = pd.read_pickle('/Users/tylerliu/GitHub/Proj3_source/train_max_x')
@@ -22,8 +22,8 @@ train_out = torch.tensor(train_out, dtype=torch.int64)
 test_img = torch.Tensor(test_img)
 
 # 自己改测试用的大小
-x = torch.unsqueeze(train_img, dim=1)[:200] / 255.
-y = train_out[:200]
+x = torch.unsqueeze(train_img, dim=1)[:26000] / 255.
+y = train_out[:26000]
 
 # mini-sample for testing
 x_t = torch.unsqueeze(train_img, dim=1)[:20] / 255.
@@ -41,12 +41,12 @@ class CNN(nn.Module):
             ),nn.ReLU(),nn.MaxPool2d(kernel_size=2)
         )
         self.conv2 = nn.Sequential(     #input_size(1,64,64)
-            nn.Conv2d(16, 32, 5, 1, 2), nn.ReLU(),nn.MaxPool2d(kernel_size=2)
+            nn.Conv2d(16, 32, 5, 1, 2), nn.ReLU(),nn.MaxPool2d(kernel_size=4)
         )
 
-        self.out3 = nn.Linear(32*32*32,32*32*32)
-        # self.out2 = nn.Linear(32 * 32 * 32, 32 * 32 * 32)
-        self.out1 = nn.Linear(32 * 32 * 32, 10)
+        self.out3 = nn.Linear(32*16*16,32*16*16)
+        self.out2 = nn.Linear(32*16*16,16*16*16)
+        self.out1 = nn.Linear(16*16*16,10)
 
 
     def forward(self,x):
@@ -54,11 +54,12 @@ class CNN(nn.Module):
         x = self.conv2(x)
         x = x.view(x.size(0),-1)
         x = F.relu(self.out3(x))
+        x = F.relu(self.out2(x))
         x = self.out1(x)
         return x
 
 cnn = CNN()
-print(cnn)
+# print(cnn)
 
 optimizer = torch.optim.Adam(cnn.parameters(), lr = LR)
 loss_fun = nn.CrossEntropyLoss()
