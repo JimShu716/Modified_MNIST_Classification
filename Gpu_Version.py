@@ -19,9 +19,9 @@ train_img = pd.read_pickle('/Users/tylerliu/GitHub/Proj3_source/train_max_x')
 test_img = pd.read_pickle('/Users/tylerliu/GitHub/Proj3_source/test_max_x')
 train_out = pd.read_csv('./data/train_max_y.csv').to_numpy().astype('int32')[:, -1]
 
-train_img = torch.Tensor(train_img)
-train_out = torch.tensor(train_out, dtype=torch.int64)
-test_img = torch.Tensor(test_img)
+train_img = torch.Tensor(train_img).cuda()
+train_out = torch.tensor(train_out, dtype=torch.int64).cuda()
+test_img = torch.Tensor(test_img).cuda()
 
 # 自己改测试用的大小 50000改成别的->?
 x = torch.unsqueeze(train_img, dim=1)[:SPLIT_RATIO*50000]/255.
@@ -45,26 +45,25 @@ cnn = nn.Sequential(
     nn.Dropout(0.5),
     nn.Linear(1024,10),
     nn.Softmax()
-)
+).cuda()
 
 # print(cnn)
 
 # optimizer = torch.optim.Adam(cnn.parameters(), lr = LR)
-# optimizer = torch.optim.Adam(cnn.parameters(), lr = 1e-4)
-optimizer = torch.optim.SGD(cnn.parameters(), lr = 1e-4)
+optimizer = torch.optim.Adam(cnn.parameters(), lr = 1e-4)
 loss_fun = nn.CrossEntropyLoss()
 
 def train():
     for epoch in range(EPOCH):
         for step, (x, y) in enumerate(train_loader):
-            output = cnn(x)
-            loss = loss_fun(output, y)
-            optimizer.zero_grad()
-            loss.backward()
-            optimizer.step()
+            output = cnn(x).cuda()
+            loss = loss_fun(output, y).cuda()
+            optimizer.zero_grad().cuda()
+            loss.backward().cuda()
+            optimizer.step().cuda()
 
             if step % 10 == 0:
-                x_t_out = cnn(x_t)
+                x_t_out = cnn(x_t).cuda()
                 y_pred = torch.max(x_t_out, dim=1)[1].data.numpy()
                 accuracy = float((y_pred == y_t.data.numpy()).astype(int).sum()) / float(y_t.size(0))
                 print('Epoch ', epoch, 'train loss: %.4f' % loss.data.numpy(), '| test accuracy: %.3f' % accuracy)
