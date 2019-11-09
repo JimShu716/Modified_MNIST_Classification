@@ -8,10 +8,10 @@ import torchvision.models as model
 import matplotlib.pyplot as plt
 
 # Hyperparameters
-EPOCH = 12
+EPOCH = 6
 BATCH_SIZE = 64
 
-LR = 0.05
+LR = 0.0001
 SPLIT_RATIO = 1
 
 # 文件路径自己去改~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ：） ：） ：） :< :< :<
@@ -25,13 +25,11 @@ test_img = torch.Tensor(test_img)
 
 # 自己改测试用的大小 50000改成别的->?
 x = torch.unsqueeze(train_img, dim=1)[:SPLIT_RATIO*50000]/255.
-# x = x.repeat(1,3,1,1)
 y = train_out[:50000]
 
 # mini-sample for testing
-x_t = torch.unsqueeze(train_img, dim=1)[:100]/255.
-# x_t = x_t.repeat(1,3,1,1)
-y_t = train_out[:100]
+x_t = torch.unsqueeze(train_img, dim=1)[:300]/255.
+y_t = train_out[:300]
 
 my_dataset = Data.TensorDataset(x, y)
 train_loader = Data.DataLoader(dataset=my_dataset, batch_size=BATCH_SIZE, shuffle=True)
@@ -69,5 +67,6 @@ def train():
                 y_pred = torch.max(x_t_out, dim=1)[1].data.numpy()
                 accuracy = float((y_pred == y_t.data.numpy()).astype(int).sum()) / float(y_t.size(0))
                 print('Epoch ', epoch, 'train loss: %.4f' % loss.data.numpy(), '| test accuracy: %.3f' % accuracy)
-
+                # if step % 30 == 0
+                # LR 做一个修正
 train()
